@@ -10,6 +10,10 @@ Make a simple webserver.
 Contributors / Licensing
 ========================
 
+This project is licensed under the Apache 2 license by Diego Becerra.
+
+The repo was forked from the CMPUT 404 Web Server assignment repository, owned by Abram Hindle and licensed under the Apache 2 license.  
+
 Generally everything is LICENSE'D under the Apache 2 license by Abram Hindle.
 
 server.py contains contributions from:
