@@ -10,7 +10,9 @@ def css_test():
     url = base + "/base.css"
     req = request.urlopen(url, None, 3)
     # Expecting status code 200
+    print("Status code:", req.getcode())
     # Expecting content type text/css
+    print("Content-type:", req.info().get_content_type())
 
 
 # Root Unit Test
@@ -35,4 +37,4 @@ def not_found_test():
         pass
         # Expecting 404 not found
 
-not_found_test()
+css_test()

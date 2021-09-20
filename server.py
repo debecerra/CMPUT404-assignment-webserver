@@ -33,10 +33,17 @@ class MyWebServer(socketserver.BaseRequestHandler):
 
     def handle(self):
         self.data = self.request.recv(1024).strip()
-        self.request.sendall(bytearray("OK", 'utf-8'))
-
         request = parse_http_request(self.data)
-        request
+        print(request.get_byte_buffer())
+        response = self.handle_request(request)
+        self.request.sendall(response.get_byte_buffer())
+
+    def handle_request(self, request):        
+        headers = {
+            "application-content": "text/css"
+        }
+        body = "hey buddy"
+        return HttpResponse(200, headers, body)
 
 
 if __name__ == "__main__":

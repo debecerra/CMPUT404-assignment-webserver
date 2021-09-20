@@ -12,8 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+HTTP_VERSION = "HTTP/1.1"
+
+
 def parse_http_request(payload):
-    print("Got a request of: \n%s\n" % payload.decode("utf-8"))
+    print("Got a request of: \n%s\n" % payload)
 
     assert type(payload) is bytes, "Expected byte string for payload"
     lines = payload.decode("utf-8").replace("\r", "").split("\n")
@@ -21,6 +25,7 @@ def parse_http_request(payload):
 
     # parse request line
     (method, request_uri, http_protocol) = lines[i].split()
+    assert http_protocol == HTTP_VERSION, f"Expecting {HTTP_VERSION} protocol"
     i += 1
 
     # parse header fields
@@ -33,35 +38,37 @@ def parse_http_request(payload):
     # parse body
     body = None
     if i < len(lines):
-        body = '\r\n'.join(lines[i+1:])
+        body = '\n'.join(lines[i+1:])
 
-    return HttpRequest(method, request_uri, http_protocol, header_fields, body)
+    return HttpRequest(method, request_uri, header_fields, body)
 
 
 class HttpRequest:
-    def __init__(self, method, route, protocol, headers, body=None):
+
+    def __init__(self, method, route, headers={}, body=None):
         self.method = method
         self.route = route
-        self.protocol = protocol
         self.headers = headers
         self.body = body
 
-    def get_method(self):
-        return self.method
-
-    def get_route(self):
-        return self.route
-
-    def get_header(self, name):
-        if name in self.headers:
-            return self.headers[name]
-        else:
-            raise ValueError(f"No header field for {name}")
-
-    def get_body(self):
-        return self.body
+    def get_byte_buffer(self):
+        request_line = f"{self.method} {self.route} {HTTP_VERSION}\r\n"
+        headers = "\r\n".join([f"{key}: {value}" for key, value in self.headers.items()]) + "\r\n"
+        body = "" if self.body == None else "\r\n" + self.body
+        message = request_line + headers + body
+        return bytes(message, 'utf-8')
 
 
-class HttpResponse():
-    def __init__():
-        pass
+class HttpResponse:
+
+    def __init__(self, status_code, headers={}, body=None):
+        self.status_code = status_code
+        self.headers = headers
+        self.body = body
+
+    def get_byte_buffer(self):
+        status_line = f"{HTTP_VERSION} {self.status_code}\r\n"
+        headers = "\r\n".join([f"{key}: {value}" for key, value in self.headers.items()]) + "\r\n"
+        body = "" if self.body == None else "\r\n" + self.body
+        message = status_line + headers + body
+        return bytes(message, 'utf-8')
