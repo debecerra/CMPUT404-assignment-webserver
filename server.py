@@ -31,6 +31,8 @@ from http_objects import parse_http_request, HttpRequest, HttpResponse
 
 class MyWebServer(socketserver.BaseRequestHandler):
 
+    ROOT_DIR = "www"
+
     def handle(self):
         self.data = self.request.recv(1024).strip()
         request = parse_http_request(self.data)
@@ -38,12 +40,41 @@ class MyWebServer(socketserver.BaseRequestHandler):
         response = self.handle_request(request)
         self.request.sendall(response.get_byte_buffer())
 
-    def handle_request(self, request):        
-        headers = {
-            "application-content": "text/css"
-        }
-        body = "hey buddy"
+    def handle_request(self, request):
+        # Python Software Foundation, "Reading and Writing Files"
+        # https://docs.python.org/3/tutorial/inputoutput.html#reading-and-writing-files
+        # PSF License Agreement and the Zero-Clause BSD license
+        body = self.get_response_body(request)
+        headers = self.get_response_headers(request, body)
         return HttpResponse(200, headers, body)
+
+    def get_response_headers(self, request, body):
+        headers = {}
+
+        # pawan_asipu, https://auth.geeksforgeeks.org/user/pawan_asipu/articles, "Python String endswith() Method",
+        # https://www.geeksforgeeks.org/python-string-endswith-method/, CCBY-SA
+        if request.route.endswith(".css"):
+            headers["Content-Type"] = "text/css"
+        elif request.route.endswith(".html") or request.route.endswith("/"):
+            headers["Content-Type"] = "text/html"
+        
+        headers["Connection"] = "close"
+
+        return headers
+            
+
+    def get_response_body(self, request):
+        path = self.ROOT_DIR + request.route
+        if path[-1] == '/':
+            path += "index.html"
+        
+        # Python Software Foundation, "Reading and Writing Files"
+        # https://docs.python.org/3/tutorial/inputoutput.html#reading-and-writing-files
+        # PSF License Agreement and the Zero-Clause BSD license
+        with open(path, "r") as f:
+            data = f.read()
+
+        return data
 
 
 if __name__ == "__main__":
