@@ -1,0 +1,38 @@
+import requests
+from urllib import request
+
+base = "http://127.0.0.1:8080"
+# data = {"Hello": "World"}
+# response = requests.post("http://localhost:8080/base.css", json=data)
+
+# CSS Unit Test
+def css_test():
+    url = base + "/base.css"
+    req = request.urlopen(url, None, 3)
+    # Expecting status code 200
+    # Expecting content type text/css
+
+
+# Root Unit Test
+def root_test():
+    url = base + "/"
+    req = request.urlopen(url, None, 3)
+    # Expecting status code 200
+
+# Index Unit Test
+def index_test():
+    url = base + "/index.html"
+    req = request.urlopen(url, None, 3)
+    # Expecting status code 200
+
+# Not found error Unit Test
+def not_found_test():
+    url = base + "/do-not-implement-this-page-it-is-not-found"
+    try:
+        req = request.urlopen(url, None, 3)
+    # Expecting a HTTP error
+    except request.HTTPError as e:
+        pass
+        # Expecting 404 not found
+
+not_found_test()
