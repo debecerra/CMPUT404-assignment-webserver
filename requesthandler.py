@@ -26,9 +26,9 @@ class RequestHandler:
             headers = {
                 "Location": e.location
             }
-            response = HttpResponse(301, headers) 
+            response = HttpResponse(301, headers)
 
-        except NotFound404: 
+        except NotFound404:
             # return 404 Not Found
             response = HttpResponse(404, {}, "404 Not Found :(")
 
@@ -57,7 +57,6 @@ class RequestHandler:
 
         # return 200 OK
         return HttpResponse(200, headers, body)
-
 
     def __read_file(self, route):
         relative_path = ROOT_DIR + route
@@ -97,19 +96,25 @@ class RequestHandler:
 
         return headers
 
+# Python Software Foundation, "User-defined Exceptions"
+# https://docs.python.org/3/tutorial/errors.html#user-defined-exceptions
+# 2021-09-21, PSF License Agreement and the Zero-Clause BSD license
 
 class HttpError(Exception):
     pass
+
 
 class MovedPermanently301(HttpError):
 
     def __init__(self, location, message=""):
         self.location = location
-        self.message = message 
+        self.message = message
         super().__init__(self.message)
+
 
 class NotFound404(HttpError):
     pass
+
 
 class MethodNotAllowed405(HttpError):
     pass

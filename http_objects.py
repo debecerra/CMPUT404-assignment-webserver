@@ -15,8 +15,8 @@
 
 HTTP_VERSION = "HTTP/1.1"
 
-# Mozilla Contributors, https://developer.mozilla.org/en-US/docs/MDN/About/contributors.txt, 
-# "HTTP response status codes", https://developer.mozilla.org/en-US/docs/Web/HTTP/Status, 
+# Mozilla Contributors, https://developer.mozilla.org/en-US/docs/MDN/About/contributors.txt,
+# "HTTP response status codes", https://developer.mozilla.org/en-US/docs/Web/HTTP/Status,
 # 2021-09-10, CC-BY-SA 2.5
 RESPONSE_MSG = {
     200: "OK",
