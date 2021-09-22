@@ -15,6 +15,20 @@
 
 HTTP_VERSION = "HTTP/1.1"
 
+# Mozilla Contributors, https://developer.mozilla.org/en-US/docs/MDN/About/contributors.txt, 
+# "HTTP response status codes", https://developer.mozilla.org/en-US/docs/Web/HTTP/Status, 
+# 2021-09-10, CC-BY-SA 2.5
+RESPONSE_MSG = {
+    200: "OK",
+
+    301: "Moved Permanently",
+
+    404: "Not Found",
+    405: "Method Not Allowed",
+
+    500: "Internal Server Error"
+}
+
 
 def parse_http_request(payload):
     print("Got a request of: \n%s\n" % payload)
@@ -53,7 +67,7 @@ class HttpRequest:
 
     def get_byte_buffer(self):
         request_line = f"{self.method} {self.route} {HTTP_VERSION}\r\n"
-        headers = "\r\n".join([f"{key}: {value}" for key, value in self.headers.items()]) + "\r\n"
+        headers = "" if self.headers == None else "\r\n".join([f"{key}: {value}" for key, value in self.headers.items()]) + "\r\n"
         body = "" if self.body == None else "\r\n" + self.body
         message = request_line + headers + body
         return bytes(message, 'utf-8')
@@ -67,8 +81,8 @@ class HttpResponse:
         self.body = body
 
     def get_byte_buffer(self):
-        status_line = f"{HTTP_VERSION} {self.status_code}\r\n"
-        headers = "\r\n".join([f"{key}: {value}" for key, value in self.headers.items()]) + "\r\n"
+        status_line = f"{HTTP_VERSION} {self.status_code} {RESPONSE_MSG[self.status_code]}\r\n"
+        headers = "" if self.headers == None else "\r\n".join([f"{key}: {value}" for key, value in self.headers.items()]) + "\r\n"
         body = "" if self.body == None else "\r\n" + self.body
         message = status_line + headers + body
         return bytes(message, 'utf-8')

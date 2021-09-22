@@ -12,7 +12,8 @@ def css_test():
     # Expecting status code 200
     print("Status code:", req.getcode())
     # Expecting content type text/css
-    print("Content-type:", req.info().get_content_type())
+    print("Headers: ", req.getheaders())
+    print(req.read().decode('utf-8'))
 
 
 # Root Unit Test
@@ -37,4 +38,11 @@ def not_found_test():
         pass
         # Expecting 404 not found
 
-css_test()
+def custom():
+    url = base + "/deep"
+    req = request.urlopen(url, None, 3)
+    print(req.getcode(), "\n")
+    print(req.getheaders(), "\n")
+    print(req.read(), "\n")
+
+custom()
