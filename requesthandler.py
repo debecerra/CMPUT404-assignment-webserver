@@ -54,7 +54,7 @@ class RequestHandler:
             print(e)
 
         finally:
-            print(f"Sending the following response:\n{response.get_byte_buffer()}\n")
+            #print(f"Sending the following response:\n{response.get_byte_buffer()}\n")
             return response
 
     def __handle_get_request(self):
@@ -63,7 +63,7 @@ class RequestHandler:
             raise NotFound404()
 
         body = self.__read_file(self.request.route)
-        print(f"Read the following from {self.request.route}: \n{body}")
+        #print(f"Read the following from {self.request.route}: \n{body}")
 
         headers = self.__generate_OK_response_headers()
 
@@ -77,7 +77,6 @@ class RequestHandler:
 
         # ihritik, https://auth.geeksforgeeks.org/user/ihritik/articles, "Python | os.path.isdir() method",
         # https://www.geeksforgeeks.org/python-os-path-isdir-method/, 2019-08-26, CC BY-SA
-        print(relative_path)
         if os.path.isdir(relative_path):
             raise MovedPermanently301(f"{HOST}{route}/")
 

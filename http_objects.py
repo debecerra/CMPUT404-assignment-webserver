@@ -32,7 +32,7 @@ RESPONSE_MSG = {
 
 
 def parse_http_request(payload):
-    print("Got a request of: \n%s\n" % payload)
+    #print("Got a request of: \n%s\n" % payload)
 
     assert type(payload) is bytes, "Expected byte string for payload"
     lines = payload.decode("utf-8").replace("\r", "").split("\n")
