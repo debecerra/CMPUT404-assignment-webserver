@@ -2,8 +2,6 @@ import requests
 from urllib import request
 
 base = "http://127.0.0.1:8080"
-# data = {"Hello": "World"}
-# response = requests.post("http://localhost:8080/base.css", json=data)
 
 # CSS Unit Test
 def css_test():
@@ -39,7 +37,7 @@ def not_found_test():
         # Expecting 404 not found
 
 def custom():
-    url = base + "/deep"
+    url = base + "/"
     req = request.urlopen(url, None, 3)
     print(req.getcode(), "\n")
     print(req.getheaders(), "\n")

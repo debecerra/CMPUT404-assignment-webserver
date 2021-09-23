@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright 2021 Diego Becerra
 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,7 @@
 # limitations under the License.
 
 
-HTTP_VERSION = "HTTP/1.1"
+from constants import HTTP_VERSION
 
 # Mozilla Contributors, https://developer.mozilla.org/en-US/docs/MDN/About/contributors.txt,
 # "HTTP response status codes", https://developer.mozilla.org/en-US/docs/Web/HTTP/Status,
@@ -59,7 +60,7 @@ def parse_http_request(payload):
 
 class HttpRequest:
 
-    def __init__(self, method, route, headers={}, body=None):
+    def __init__(self, method, route, headers={}, body=""):
         self.method = method
         self.route = route
         self.headers = headers
@@ -67,22 +68,22 @@ class HttpRequest:
 
     def get_byte_buffer(self):
         request_line = f"{self.method} {self.route} {HTTP_VERSION}\r\n"
-        headers = "" if self.headers == None else "\r\n".join([f"{key}: {value}" for key, value in self.headers.items()]) + "\r\n"
-        body = "" if self.body == None else "\r\n" + self.body
+        headers = "" if len(self.headers) == 0 else "\r\n".join([f"{key}: {value}" for key, value in self.headers.items()]) + "\r\n"
+        body = "\r\n" + self.body
         message = request_line + headers + body
         return bytes(message, 'utf-8')
 
 
 class HttpResponse:
 
-    def __init__(self, status_code, headers={}, body=None):
+    def __init__(self, status_code, headers={}, body=""):
         self.status_code = status_code
         self.headers = headers
         self.body = body
 
     def get_byte_buffer(self):
         status_line = f"{HTTP_VERSION} {self.status_code} {RESPONSE_MSG[self.status_code]}\r\n"
-        headers = "" if self.headers == None else "\r\n".join([f"{key}: {value}" for key, value in self.headers.items()]) + "\r\n"
-        body = "" if self.body == None else "\r\n" + self.body
+        headers = "" if len(self.headers) == 0 else "\r\n".join([f"{key}: {value}" for key, value in self.headers.items()]) + "\r\n"
+        body = "\r\n" + self.body
         message = status_line + headers + body
         return bytes(message, 'utf-8')

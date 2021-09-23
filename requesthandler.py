@@ -1,10 +1,22 @@
+#!/usr/bin/env python
+# Copyright 2021 Diego Becerra
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
 import os.path
 from http_objects import HttpRequest, HttpResponse
-
-ROOT_DIR = "www"
-
-GET = "GET"
-
+from constants import ROOT_DIR, HOST
 
 class RequestHandler:
 
@@ -16,7 +28,7 @@ class RequestHandler:
 
     def handle_request(self):
         try:
-            if self.request.method == GET:
+            if self.request.method == "GET":
                 response = self.__handle_get_request()
             else:
                 raise MethodNotAllowed405()
@@ -53,7 +65,7 @@ class RequestHandler:
         body = self.__read_file(self.request.route)
         print(f"Read the following from {self.request.route}: \n{body}")
 
-        headers = self.__generate_get_response_headers()
+        headers = self.__generate_OK_response_headers()
 
         # return 200 OK
         return HttpResponse(200, headers, body)
@@ -67,7 +79,7 @@ class RequestHandler:
         # https://www.geeksforgeeks.org/python-os-path-isdir-method/, 2019-08-26, CC BY-SA
         print(relative_path)
         if os.path.isdir(relative_path):
-            raise MovedPermanently301(route + "/")
+            raise MovedPermanently301(f"{HOST}{route}/")
 
         try:
             # Python Software Foundation, "Reading and Writing Files"
@@ -81,7 +93,7 @@ class RequestHandler:
         except FileNotFoundError:
             raise NotFound404()
 
-    def __generate_get_response_headers(self):
+    def __generate_OK_response_headers(self):
         headers = {}
 
         # identify content type for HTML/CSS
@@ -91,6 +103,8 @@ class RequestHandler:
             headers["Content-Type"] = "text/css"
         elif self.request.route.endswith(".html") or self.request.route.endswith("/"):
             headers["Content-Type"] = "text/html"
+        else: 
+            headers["Content-Type"] = "application/octet-stream"
 
         headers["Connection"] = "close"
 
@@ -100,10 +114,11 @@ class RequestHandler:
 # https://docs.python.org/3/tutorial/errors.html#user-defined-exceptions
 # 2021-09-21, PSF License Agreement and the Zero-Clause BSD license
 
+# Parent class for all HttpErrors
 class HttpError(Exception):
     pass
 
-
+# Error for when status code 301 is thrown
 class MovedPermanently301(HttpError):
 
     def __init__(self, location, message=""):
@@ -111,10 +126,10 @@ class MovedPermanently301(HttpError):
         self.message = message
         super().__init__(self.message)
 
-
+# Error for when status code 404 is thrown
 class NotFound404(HttpError):
     pass
 
-
+# Error for when status code 405 is thrown
 class MethodNotAllowed405(HttpError):
     pass
