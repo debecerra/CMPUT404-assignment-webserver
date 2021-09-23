@@ -33,7 +33,7 @@ from http_objects import parse_http_request, HttpRequest, HttpResponse
 class MyWebServer(socketserver.BaseRequestHandler):
 
     def handle(self):
-        self.data = self.request.recv(1024).strip()
+        self.data = self.request.recv(4096).strip()
         request = parse_http_request(self.data)
 
         handler = RequestHandler(request)

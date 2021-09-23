@@ -14,7 +14,7 @@
 # limitations under the License.
 
 
-import os.path
+import os.path, urllib.parse
 from http_objects import HttpRequest, HttpResponse
 from constants import ROOT_DIR, HOST
 
@@ -71,7 +71,7 @@ class RequestHandler:
         return HttpResponse(200, headers, body)
 
     def __read_file(self, route):
-        relative_path = ROOT_DIR + route
+        relative_path = ROOT_DIR + urllib.parse.unquote(route)
         if relative_path[-1] == '/':
             relative_path += "index.html"
 
