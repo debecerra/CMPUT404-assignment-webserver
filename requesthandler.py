@@ -14,9 +14,13 @@
 # limitations under the License.
 
 
-import os.path, urllib.parse
+import os.path
+import urllib.parse
+from datetime import datetime
+from time import mktime
 from http_objects import HttpRequest, HttpResponse
 from constants import ROOT_DIR, HOST
+
 
 class RequestHandler:
 
@@ -65,12 +69,15 @@ class RequestHandler:
         body = self.__read_file(self.request.route)
         #print(f"Read the following from {self.request.route}: \n{body}")
 
-        headers = self.__generate_OK_response_headers()
+        headers = self.__generate_OK_response_headers(body)
 
         # return 200 OK
         return HttpResponse(200, headers, body)
 
     def __read_file(self, route):
+        # Python Software Foundation, "url-quoting"
+        # https://docs.python.org/3/library/urllib.parse.html#url-quoting
+        # 2021-09-24, PSF License Agreement and the Zero-Clause BSD license
         relative_path = ROOT_DIR + urllib.parse.unquote(route)
         if relative_path[-1] == '/':
             relative_path += "index.html"
@@ -92,8 +99,10 @@ class RequestHandler:
         except FileNotFoundError:
             raise NotFound404()
 
-    def __generate_OK_response_headers(self):
+    def __generate_OK_response_headers(self, body=None):
         headers = {}
+
+        headers["Date"] = self.__get_http_date()
 
         # identify content type for HTML/CSS
         # pawan_asipu, https://auth.geeksforgeeks.org/user/pawan_asipu/articles, "Python String endswith() Method",
@@ -102,12 +111,32 @@ class RequestHandler:
             headers["Content-Type"] = "text/css"
         elif self.request.route.endswith(".html") or self.request.route.endswith("/"):
             headers["Content-Type"] = "text/html"
-        else: 
+        else:
             headers["Content-Type"] = "application/octet-stream"
+
+        if body:
+            # Kris, https://stackoverflow.com/users/3783770/kris, "Python: Get size of string in bytes",
+            # https://stackoverflow.com/a/30686735, 2015-06-15, CC BY-SA 3.0
+            headers["Content-Length"] = len(body.encode('utf-8'))
 
         headers["Connection"] = "close"
 
         return headers
+
+    # Florian Bösch, https://stackoverflow.com/users/19435/florian-b%c3%b6sch, "RFC 1123 Date Representation in Python?",
+    # https://stackoverflow.com/a/225106, CC BY-SA 2.5
+    def __get_http_date(self):
+        """Return a string representation of a date according to RFC 1123
+        (HTTP/1.1).
+        """
+
+        now = datetime.utcnow()
+        weekday = ["Mon", "Tue", "Wed", "Thu",
+                   "Fri", "Sat", "Sun"][now.weekday()]
+        month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
+                 "Oct", "Nov", "Dec"][now.month - 1]
+        return "%s, %02d %s %04d %02d:%02d:%02d GMT" % (weekday, now.day, month,
+                                                        now.year, now.hour, now.minute, now.second)
 
 # Python Software Foundation, "User-defined Exceptions"
 # https://docs.python.org/3/tutorial/errors.html#user-defined-exceptions
